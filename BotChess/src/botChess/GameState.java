@@ -128,7 +128,7 @@ public class GameState {
 				}else {
 					north = false;
 				}
-				if(y - i > 0 && south) {//Check for a move south
+				if(y - i >= 0 && south) {//Check for a move south
 					if(checkTeam(x, y - i) != checkTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x, y - i));
 						if(checkTeam(x, y - i) != 0) {
@@ -152,7 +152,7 @@ public class GameState {
 				}else {
 					east = false;
 				}
-				if(x - i > 0 && west) {//Check for a move west
+				if(x - i >= 0 && west) {//Check for a move west
 					if(checkTeam(x - i, y) != checkTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x - i, y));
 						if(checkTeam(x - i, y) != 0) {
@@ -214,7 +214,7 @@ public class GameState {
 				}else {
 					northeast = false;
 				}
-				if((x + i < 8 && y - i > 0) && southeast) {//Check for a move southeast
+				if((x + i < 8 && y - i >= 0) && southeast) {//Check for a move southeast
 					if(checkTeam(x + i, y - i) != checkTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x + i, y - i));
 						if(checkTeam(x + i, y - i) != 0) {
@@ -226,7 +226,7 @@ public class GameState {
 				}else {
 					southeast = false;
 				}
-				if((x - i > 0 && y + i < 8) && northwest) {//Check for a move east
+				if((x - i >= 0 && y + i < 8) && northwest) {//Check for a move east
 					if(checkTeam(x - i, y + i) != checkTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x - i, y + i));
 						if(checkTeam(x - i, y + i) != 0) {
@@ -238,7 +238,7 @@ public class GameState {
 				}else {
 					northwest = false;
 				}
-				if((x - i > 0 && y - i > 0) && southwest) {//Check for a move west
+				if((x - i >= 0 && y - i >= 0) && southwest) {//Check for a move west
 					if(checkTeam(x - i, y - i) != checkTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x - i, y - i));
 						if(checkTeam(x - i, y - i) != 0) {
@@ -272,7 +272,7 @@ public class GameState {
 				}else {
 					northeastQueen = false;
 				}
-				if((x + i < 8 && y - i > 0) && southeastQueen) {//Check for a move southeast
+				if((x + i < 8 && y - i >= 0) && southeastQueen) {//Check for a move southeast
 					if(checkTeam(x + i, y - i) != checkTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x + i, y - i));
 						if(checkTeam(x + i, y - i) != 0) {
@@ -284,7 +284,7 @@ public class GameState {
 				}else {
 					southeastQueen = false;
 				}
-				if((x - i > 0 && y + i < 8) && northwestQueen) {//Check for a move east
+				if((x - i >= 0 && y + i < 8) && northwestQueen) {//Check for a move east
 					if(checkTeam(x - i, y + i) != checkTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x - i, y + i));
 						if(checkTeam(x - i, y + i) != 0) {
@@ -296,7 +296,7 @@ public class GameState {
 				}else {
 					northwestQueen = false;
 				}
-				if((x - i > 0 && y - i > 0) && southwestQueen) {//Check for a move west
+				if((x - i >= 0 && y - i >= 0) && southwestQueen) {//Check for a move west
 					if(checkTeam(x - i, y - i) != checkTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x - i, y - i));
 						if(checkTeam(x - i, y - i) != 0) {
@@ -326,7 +326,7 @@ public class GameState {
 				}else {
 					northQueen = false;
 				}
-				if(y - i > 0 && southQueen) {//Check for a move south
+				if(y - i >= 0 && southQueen) {//Check for a move south
 					if(checkTeam(x, y - i) != checkTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x, y - i));
 						if(checkTeam(x, y - i) != 0) {
@@ -350,7 +350,7 @@ public class GameState {
 				}else {
 					eastQueen = false;
 				}
-				if(x - i > 0 && westQueen) {//Check for a move west
+				if(x - i >= 0 && westQueen) {//Check for a move west
 					if(checkTeam(x - i, y) != checkTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x - i, y));
 						if(checkTeam(x - i, y) != 0) {
@@ -400,7 +400,7 @@ public class GameState {
 				possibleMoves.remove(i);
 			}
 		}
-		
+
 		//Convert the ArrayList to an array and return it
 		Move[] output = new Move[possibleMoves.size()];
 		return possibleMoves.toArray(output);

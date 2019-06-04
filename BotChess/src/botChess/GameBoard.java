@@ -49,7 +49,7 @@ public class GameBoard extends JPanel{
 			g.drawImage(SpriteLoader.getImage(spriteList[13]), GameHandler.getSelectedX() * 64, (-GameHandler.getSelectedY() * 64) + 448, this);
 			
 			//Draw the possible moves
-			Move[] possibleMoves = GameHandler.getCurrentGameThread().getCurrentGameState().getPossibleMoves(GameHandler.getCurrentGameThread().getCurrentTurn(), GameHandler.getSelectedX(), GameHandler.getSelectedY());
+			Move[] possibleMoves = GameHandler.getCurrentGameThread().getCurrentGameState().getPossibleMoves(GameHandler.getCurrentGameThread().getCurrentTeamTurn(), GameHandler.getSelectedX(), GameHandler.getSelectedY());
 			for(int i = 0; i < possibleMoves.length; i++) {
 				g.drawImage(SpriteLoader.getImage(spriteList[14]), possibleMoves[i].getDestX() * 64, (-possibleMoves[i].getDestY() * 64) + 448, this);
 			}

@@ -20,7 +20,11 @@ public class PlayerHuman extends Player{
 	}
 	
 	public void tileClicked(int x, int y) {
+		System.out.println("Move created");
 		queuedMove = new Move(GameHandler.getSelectedX(), GameHandler.getSelectedY(), x, y);
+		if(queuedMove == null) {
+			System.out.println("Created move equals null");
+		}
 		queuedMoveSent = false;
 	}
 }

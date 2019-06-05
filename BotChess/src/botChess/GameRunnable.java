@@ -8,9 +8,12 @@ public class GameRunnable implements Runnable{
 	private Player[] currentPlayers;
 	private int currentTurn = 0;
 	
-	public GameRunnable(GameState gs, Player[] players) {
+	private int turnTime;
+	
+	public GameRunnable(GameState gs, Player[] players, int turnTime) {
 		currentGameState = gs;
 		currentPlayers = players;
+		this.turnTime = turnTime;
 	}
 	
 	@Override
@@ -36,19 +39,22 @@ public class GameRunnable implements Runnable{
 				}
 				
 				if(!foundMove) {
-					System.out.println("Invalid move");
 					nextMove = null;
 				}else {
 					//Perform the move
-					System.out.println("Found move");
 					currentGameState.makeMove(nextMove);
 					nextMove = null;
 					if(currentTurn == 0) {
 						currentTurn = 1;
-						System.out.println("Turn 1");
 					}else {
 						currentTurn = 0;
-						System.out.println("Turn 0");
+					}
+					
+					//Wait for the given "turnTime"
+					try {
+						Thread.sleep(turnTime);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
 					}
 				}
 			}

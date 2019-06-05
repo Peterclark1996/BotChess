@@ -43,7 +43,7 @@ public class GameHandler {
 	static ActionListener playerChange = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			//Add black player at the end if the play player isnt "No player"
+			//Add blank player at the end if the play player isnt "No player"
 			if(((JComboBox<String>) panelSetupMid.getComponent(panelSetupMid.getComponentCount() - 1)).getSelectedIndex() != 0) {
 				JComboBox<String> temp = new JComboBox<String>(playerNames);
 				temp.addActionListener(playerChange);
@@ -89,10 +89,10 @@ public class GameHandler {
 		inputShowGames = new JCheckBox();
 		panelSetupTop.add(inputShowGames);
 		panelSetupTop.add(new JLabel("Turn Time (ms):"));
-		inputTurnTime = new JTextField();
+		inputTurnTime = new JTextField("1000");
 		panelSetupTop.add(inputTurnTime);
 		panelSetupTop.add(new JLabel("Games Per Matchup:"));
-		inputGamesPerMatchup = new JTextField();
+		inputGamesPerMatchup = new JTextField("1");
 		panelSetupTop.add(inputGamesPerMatchup);
 		
 		//Build the player list
@@ -143,12 +143,39 @@ public class GameHandler {
 	}
 	
 	public static void loadInstance() {
+		//Validate input settings
+		if(Integer.valueOf(inputTurnTime.getText()) == null) {
+			return;
+		}
+		if(Integer.valueOf(inputGamesPerMatchup.getText()) == null) {//TODO Use this setting
+			return;
+		}
+		if(panelSetupMid.getComponentCount() != 3) {//TODO make this accept more that two players (Value is 3 because the last combo box will always be "No player")
+			return;
+		}
+		
+		//Build the player list
+		Player[] players = new Player[panelSetupMid.getComponentCount()];
+		for(int i = 0; i < panelSetupMid.getComponentCount() - 1; i++) {
+			switch(((JComboBox<String>)panelSetupMid.getComponent(i)).getSelectedIndex()) {
+			case 0:
+				return;
+			case 1:
+				players[i] = new PlayerHuman(i + 1);
+				break;
+			case 2:
+				players[i] = new PlayerRandom(i + 1);
+				break;
+			}
+		}
+
+		//Setup the frame
         frame.setVisible(false);
         frameGame.setVisible(true);
         frameGame.pack();
         
-        //TODO Load all settings and players properly
-        currentGameRunnable = new GameRunnable(new GameState(), new Player[] {new PlayerHuman(1), new PlayerHuman(2)});
+        //Setup the game thread
+        currentGameRunnable = new GameRunnable(new GameState(), players, Integer.valueOf(inputTurnTime.getText()));
         currentGameThread = new Thread(currentGameRunnable);
         currentGameThread.start();
 	}

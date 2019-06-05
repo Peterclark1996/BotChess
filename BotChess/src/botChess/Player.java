@@ -2,8 +2,8 @@ package botChess;
 
 public abstract class Player {
 	
-	private Move lastMove = null;
-	private int team = 0;
+	protected Move lastMove = null;
+	protected int team = 0;
 	
 	public Player(int team) {
 		if(team != 1 && team != 2) {

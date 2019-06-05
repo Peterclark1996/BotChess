@@ -20,7 +20,7 @@ public class GameState {
 	//12 = black king
 	
 	public GameState() {
-		//Initialize the board
+		//Initialise the board
 		board = new int[8][8];
 		for(int y = 0; y < 8; y++) {
 			for(int x = 0; x < 8; x++) {
@@ -64,7 +64,27 @@ public class GameState {
 		}
 	}
 	
-	public Move[] getPossibleMoves(int team, int x, int y) {//TODO test this (Also disallow king moving to check)
+	public Move[] getAllPossibleMoves(int team) {
+		ArrayList<Move> moveArrayList = new ArrayList<Move>();
+		
+		//Get all the moves for each tile
+		for(int y = 0; y < 8; y++) {
+			for(int x = 0; x < 8; x++) {
+				Move[] moves = getPossibleMoves(team, x, y);
+				if(moves != null) {
+					for(int i = 0; i < moves.length; i++) {
+						moveArrayList.add(moves[i]);
+					}
+				}
+			}
+		}
+		
+		//Convert the ArrayList to an array and return it
+		Move[] output = new Move[moveArrayList.size()];
+		return moveArrayList.toArray(output);
+	}
+	
+	public Move[] getPossibleMoves(int team, int x, int y) {//TODO Disallow king moving to check (Check mate)
 		//0 = either team
 		//1 = white
 		//2 = black

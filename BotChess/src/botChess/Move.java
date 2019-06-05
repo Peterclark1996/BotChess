@@ -8,11 +8,6 @@ public class Move {
 	private int dy;
 	
 	public Move(int sx, int sy, int dx, int dy) throws IllegalArgumentException {
-		/*
-		if(sx < 0 || sx > 7 || sy < 0 || sy > 7 || dx < 0 || dx > 7 || dy < 0 || dy > 7) {
-			throw new IllegalArgumentException();
-		}
-		*/
 		this.sx = sx;
 		this.sy = sy;
 		this.dx = dx;

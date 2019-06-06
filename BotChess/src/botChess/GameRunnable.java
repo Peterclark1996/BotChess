@@ -19,7 +19,22 @@ public class GameRunnable implements Runnable{
 	@Override
 	public void run() {
 		while(true) {//TODO change "true" to a actual win/draw condition
-			Move nextMove = currentPlayers[currentTurn].takeTurn(currentGameState);
+			//Check if the current player is in check
+			//TODO Check if the current play is actually in check mate
+			//TODO Force the player to move then king when in check
+			boolean inCheck = false;
+			for(int y = 0; y < 8; y++) {
+				for(int x = 0; x < 8; x++) {
+					if((currentGameState.getObjectAtTile(x, y) == 6 || currentGameState.getObjectAtTile(x, y) == 12) && currentGameState.getTeam(x, y) == getCurrentTeamTurn()) {
+						if(!currentGameState.isTileSafe(getCurrentTeamTurn(), x, y)) {
+							inCheck = true;
+						}
+					}
+				}
+			}
+			
+			//Get the players move
+			Move nextMove = currentPlayers[currentTurn].takeTurn(currentGameState, inCheck);
 
 			//Check for a given move
 			if(nextMove == null) {

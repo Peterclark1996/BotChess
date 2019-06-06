@@ -64,6 +64,34 @@ public class GameState {
 		}
 	}
 	
+	public boolean isTileSafe(int team, int x, int y) {
+		if(team != 1 && team != 2) {
+			return false;
+		}
+		
+		//Get the enemy team id
+		int enemyTeam = 0;
+		if(team == 1) {
+			enemyTeam = 2;
+		}else {
+			enemyTeam = 1;
+		}
+		
+		//Get every enemy move and return false if an enemy can move onto that the tile
+		for(int y2 = 0; y2 < 8; y2++) {
+			for(int x2 = 0; x2 < 8; x2++) {
+				Move[] moves = getPossibleMoves(enemyTeam, x2, y2);
+				for(int i = 0; i < moves.length - 1; i++) {
+					if(moves[i].getDestX() == x && moves[i].getDestY() == y) {
+						return false;
+					}
+				}
+			}
+		}
+		
+		return true;
+	}
+	
 	public Move[] getAllPossibleMoves(int team) {
 		ArrayList<Move> moveArrayList = new ArrayList<Move>();
 		
@@ -88,7 +116,7 @@ public class GameState {
 		//0 = either team
 		//1 = white
 		//2 = black
-		if((checkTeam(x, y) != team && team != 0) || board[x][y] == 0) {
+		if((getTeam(x, y) != team && team != 0) || board[x][y] == 0) {
 			return new Move[0];
 		}
 
@@ -97,16 +125,16 @@ public class GameState {
 		case 1:
 			//White Pawn
 			if(y != 7) {
-				if(checkTeam(x - 1, y + 1) == 2) {//Check for a move north-west if there is an enemy
+				if(getTeam(x - 1, y + 1) == 2) {//Check for a move north-west if there is an enemy
 					possibleMoves.add(new Move(x, y, x - 1, y + 1));
 				}
-				if(checkTeam(x + 1, y + 1) == 2) {//Check for a move north-east if there is an enemy
+				if(getTeam(x + 1, y + 1) == 2) {//Check for a move north-east if there is an enemy
 					possibleMoves.add(new Move(x, y, x + 1, y + 1));
 				}
-				if(checkTeam(x, y + 1) == 0) {//Check for a move north
+				if(getTeam(x, y + 1) == 0) {//Check for a move north
 					possibleMoves.add(new Move(x, y, x, y + 1));
 				}
-				if(checkTeam(x, y + 2) == 0 && y == 1) {//Check for a double move north if in starting position
+				if(getTeam(x, y + 2) == 0 && y == 1) {//Check for a double move north if in starting position
 					possibleMoves.add(new Move(x, y, x, y + 2));
 				}
 			}
@@ -114,16 +142,16 @@ public class GameState {
 		case 7:
 			//Black Pawn
 			if(y != 0) {
-				if(checkTeam(x - 1, y - 1) == 1) {//Check for a move south-west if there is an enemy
+				if(getTeam(x - 1, y - 1) == 1) {//Check for a move south-west if there is an enemy
 					possibleMoves.add(new Move(x, y, x - 1, y - 1));
 				}
-				if(checkTeam(x + 1, y - 1) == 1) {//Check for a move south-east if there is an enemy
+				if(getTeam(x + 1, y - 1) == 1) {//Check for a move south-east if there is an enemy
 					possibleMoves.add(new Move(x, y, x + 1, y - 1));
 				}
-				if(checkTeam(x, y - 1) == 0) {//Check for a move south
+				if(getTeam(x, y - 1) == 0) {//Check for a move south
 					possibleMoves.add(new Move(x, y, x, y - 1));
 				}
-				if(checkTeam(x, y - 2) == 0 && y == 6) {//Check for a double move south if in starting position
+				if(getTeam(x, y - 2) == 0 && y == 6) {//Check for a double move south if in starting position
 					possibleMoves.add(new Move(x, y, x, y - 2));
 				}
 			}
@@ -137,9 +165,9 @@ public class GameState {
 			boolean west = true;
 			for(int i = 1; i < 8; i++) {
 				if(y + i < 8 && north) {//Check for a move north
-					if(checkTeam(x, y + i) != checkTeam(x, y)) {
+					if(getTeam(x, y + i) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x, y + i));
-						if(checkTeam(x, y + i) != 0) {
+						if(getTeam(x, y + i) != 0) {
 							north = false;
 						}
 					}else {
@@ -149,9 +177,9 @@ public class GameState {
 					north = false;
 				}
 				if(y - i >= 0 && south) {//Check for a move south
-					if(checkTeam(x, y - i) != checkTeam(x, y)) {
+					if(getTeam(x, y - i) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x, y - i));
-						if(checkTeam(x, y - i) != 0) {
+						if(getTeam(x, y - i) != 0) {
 							south = false;
 						}
 					}else {
@@ -161,9 +189,9 @@ public class GameState {
 					south = false;
 				}
 				if(x + i < 8 && east) {//Check for a move east
-					if(checkTeam(x + i, y) != checkTeam(x, y)) {
+					if(getTeam(x + i, y) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x + i, y));
-						if(checkTeam(x + i, y) != 0) {
+						if(getTeam(x + i, y) != 0) {
 							east = false;
 						}
 					}else {
@@ -173,9 +201,9 @@ public class GameState {
 					east = false;
 				}
 				if(x - i >= 0 && west) {//Check for a move west
-					if(checkTeam(x - i, y) != checkTeam(x, y)) {
+					if(getTeam(x - i, y) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x - i, y));
-						if(checkTeam(x - i, y) != 0) {
+						if(getTeam(x - i, y) != 0) {
 							west = false;
 						}
 					}else {
@@ -189,28 +217,28 @@ public class GameState {
 		case 3:
 		case 9:
 			//Knight
-			if(checkTeam(x + 1, y + 2) != checkTeam(x, y)) {
+			if(getTeam(x + 1, y + 2) != getTeam(x, y)) {
 				possibleMoves.add(new Move(x, y, x + 1, y + 2));
 			}
-			if(checkTeam(x - 1, y + 2) != checkTeam(x, y)) {
+			if(getTeam(x - 1, y + 2) != getTeam(x, y)) {
 				possibleMoves.add(new Move(x, y, x - 1, y + 2));
 			}
-			if(checkTeam(x - 2, y + 1) != checkTeam(x, y)) {
+			if(getTeam(x - 2, y + 1) != getTeam(x, y)) {
 				possibleMoves.add(new Move(x, y, x - 2, y + 1));
 			}
-			if(checkTeam(x + 2, y + 1) != checkTeam(x, y)) {
+			if(getTeam(x + 2, y + 1) != getTeam(x, y)) {
 				possibleMoves.add(new Move(x, y, x + 2, y + 1));
 			}
-			if(checkTeam(x - 2, y - 1) != checkTeam(x, y)) {
+			if(getTeam(x - 2, y - 1) != getTeam(x, y)) {
 				possibleMoves.add(new Move(x, y, x - 2, y - 1));
 			}
-			if(checkTeam(x - 1, y - 2) != checkTeam(x, y)) {
+			if(getTeam(x - 1, y - 2) != getTeam(x, y)) {
 				possibleMoves.add(new Move(x, y, x - 1, y - 2));
 			}
-			if(checkTeam(x + 1, y - 2) != checkTeam(x, y)) {
+			if(getTeam(x + 1, y - 2) != getTeam(x, y)) {
 				possibleMoves.add(new Move(x, y, x + 1, y - 2));
 			}
-			if(checkTeam(x + 2, y - 1) != checkTeam(x, y)) {
+			if(getTeam(x + 2, y - 1) != getTeam(x, y)) {
 				possibleMoves.add(new Move(x, y, x + 2, y - 1));
 			}
 			break;
@@ -223,9 +251,9 @@ public class GameState {
 			boolean southwest = true;
 			for(int i = 1; i < 8; i++) {
 				if((y + i < 8 && x + i < 8) && northeast) {//Check for a move northeast
-					if(checkTeam(x + i, y + i) != checkTeam(x, y)) {
+					if(getTeam(x + i, y + i) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x + i, y + i));
-						if(checkTeam(x + i, y + i) != 0) {
+						if(getTeam(x + i, y + i) != 0) {
 							northeast = false;
 						}
 					}else {
@@ -235,9 +263,9 @@ public class GameState {
 					northeast = false;
 				}
 				if((x + i < 8 && y - i >= 0) && southeast) {//Check for a move southeast
-					if(checkTeam(x + i, y - i) != checkTeam(x, y)) {
+					if(getTeam(x + i, y - i) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x + i, y - i));
-						if(checkTeam(x + i, y - i) != 0) {
+						if(getTeam(x + i, y - i) != 0) {
 							southeast = false;
 						}
 					}else {
@@ -247,9 +275,9 @@ public class GameState {
 					southeast = false;
 				}
 				if((x - i >= 0 && y + i < 8) && northwest) {//Check for a move east
-					if(checkTeam(x - i, y + i) != checkTeam(x, y)) {
+					if(getTeam(x - i, y + i) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x - i, y + i));
-						if(checkTeam(x - i, y + i) != 0) {
+						if(getTeam(x - i, y + i) != 0) {
 							northwest = false;
 						}
 					}else {
@@ -259,9 +287,9 @@ public class GameState {
 					northwest = false;
 				}
 				if((x - i >= 0 && y - i >= 0) && southwest) {//Check for a move west
-					if(checkTeam(x - i, y - i) != checkTeam(x, y)) {
+					if(getTeam(x - i, y - i) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x - i, y - i));
-						if(checkTeam(x - i, y - i) != 0) {
+						if(getTeam(x - i, y - i) != 0) {
 							southwest = false;
 						}
 					}else {
@@ -281,9 +309,9 @@ public class GameState {
 			boolean southwestQueen = true;
 			for(int i = 1; i < 8; i++) {
 				if((y + i < 8 && x + i < 8) && northeastQueen) {//Check for a move northeast
-					if(checkTeam(x + i, y + i) != checkTeam(x, y)) {
+					if(getTeam(x + i, y + i) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x + i, y + i));
-						if(checkTeam(x + i, y + i) != 0) {
+						if(getTeam(x + i, y + i) != 0) {
 							northeastQueen = false;
 						}
 					}else {
@@ -293,9 +321,9 @@ public class GameState {
 					northeastQueen = false;
 				}
 				if((x + i < 8 && y - i >= 0) && southeastQueen) {//Check for a move southeast
-					if(checkTeam(x + i, y - i) != checkTeam(x, y)) {
+					if(getTeam(x + i, y - i) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x + i, y - i));
-						if(checkTeam(x + i, y - i) != 0) {
+						if(getTeam(x + i, y - i) != 0) {
 							southeastQueen = false;
 						}
 					}else {
@@ -305,9 +333,9 @@ public class GameState {
 					southeastQueen = false;
 				}
 				if((x - i >= 0 && y + i < 8) && northwestQueen) {//Check for a move east
-					if(checkTeam(x - i, y + i) != checkTeam(x, y)) {
+					if(getTeam(x - i, y + i) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x - i, y + i));
-						if(checkTeam(x - i, y + i) != 0) {
+						if(getTeam(x - i, y + i) != 0) {
 							northwestQueen = false;
 						}
 					}else {
@@ -317,9 +345,9 @@ public class GameState {
 					northwestQueen = false;
 				}
 				if((x - i >= 0 && y - i >= 0) && southwestQueen) {//Check for a move west
-					if(checkTeam(x - i, y - i) != checkTeam(x, y)) {
+					if(getTeam(x - i, y - i) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x - i, y - i));
-						if(checkTeam(x - i, y - i) != 0) {
+						if(getTeam(x - i, y - i) != 0) {
 							southwestQueen = false;
 						}
 					}else {
@@ -335,9 +363,9 @@ public class GameState {
 			boolean westQueen = true;
 			for(int i = 1; i < 8; i++) {
 				if(y + i < 8 && northQueen) {//Check for a move north
-					if(checkTeam(x, y + i) != checkTeam(x, y)) {
+					if(getTeam(x, y + i) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x, y + i));
-						if(checkTeam(x, y + i) != 0) {
+						if(getTeam(x, y + i) != 0) {
 							northQueen = false;
 						}
 					}else {
@@ -347,9 +375,9 @@ public class GameState {
 					northQueen = false;
 				}
 				if(y - i >= 0 && southQueen) {//Check for a move south
-					if(checkTeam(x, y - i) != checkTeam(x, y)) {
+					if(getTeam(x, y - i) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x, y - i));
-						if(checkTeam(x, y - i) != 0) {
+						if(getTeam(x, y - i) != 0) {
 							southQueen = false;
 						}
 					}else {
@@ -359,9 +387,9 @@ public class GameState {
 					southQueen = false;
 				}
 				if(x + i < 8 && eastQueen) {//Check for a move east
-					if(checkTeam(x + i, y) != checkTeam(x, y)) {
+					if(getTeam(x + i, y) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x + i, y));
-						if(checkTeam(x + i, y) != 0) {
+						if(getTeam(x + i, y) != 0) {
 							eastQueen = false;
 						}
 					}else {
@@ -371,9 +399,9 @@ public class GameState {
 					eastQueen = false;
 				}
 				if(x - i >= 0 && westQueen) {//Check for a move west
-					if(checkTeam(x - i, y) != checkTeam(x, y)) {
+					if(getTeam(x - i, y) != getTeam(x, y)) {
 						possibleMoves.add(new Move(x, y, x - i, y));
-						if(checkTeam(x - i, y) != 0) {
+						if(getTeam(x - i, y) != 0) {
 							westQueen = false;
 						}
 					}else {
@@ -387,29 +415,45 @@ public class GameState {
 		case 6:
 		case 12:
 			//King
-			if(checkTeam(x, y + 1) != checkTeam(x, y)) {
-				possibleMoves.add(new Move(x, y, x, y + 1));
+			if(getTeam(x, y + 1) != getTeam(x, y)) {
+				if(isTileSafe(getTeam(x, y), x, y + 1)) {
+					possibleMoves.add(new Move(x, y, x, y + 1));
+				}
 			}
-			if(checkTeam(x + 1, y + 1) != checkTeam(x, y)) {
-				possibleMoves.add(new Move(x, y, x + 1, y + 1));
+			if(getTeam(x + 1, y + 1) != getTeam(x, y)) {
+				if(isTileSafe(getTeam(x, y), x + 1, y + 1)) {
+					possibleMoves.add(new Move(x, y, x + 1, y + 1));
+				}
 			}
-			if(checkTeam(x - 1, y + 1) != checkTeam(x, y)) {
-				possibleMoves.add(new Move(x, y, x - 1, y + 1));
+			if(getTeam(x - 1, y + 1) != getTeam(x, y)) {
+				if(isTileSafe(getTeam(x, y), x - 1, y + 1)) {
+					possibleMoves.add(new Move(x, y, x - 1, y + 1));
+				}
 			}
-			if(checkTeam(x + 1, y) != checkTeam(x, y)) {
-				possibleMoves.add(new Move(x, y, x + 1, y));
+			if(getTeam(x + 1, y) != getTeam(x, y)) {
+				if(isTileSafe(getTeam(x, y), x + 1, y)) {
+					possibleMoves.add(new Move(x, y, x + 1, y));
+				}
 			}
-			if(checkTeam(x - 1, y) != checkTeam(x, y)) {
-				possibleMoves.add(new Move(x, y, x - 1, y));
+			if(getTeam(x - 1, y) != getTeam(x, y)) {
+				if(isTileSafe(getTeam(x, y), x - 1, y)) {
+					possibleMoves.add(new Move(x, y, x - 1, y));
+				}
 			}
-			if(checkTeam(x, y - 1) != checkTeam(x, y)) {
-				possibleMoves.add(new Move(x, y, x, y - 1));
+			if(getTeam(x, y - 1) != getTeam(x, y)) {
+				if(isTileSafe(getTeam(x, y), x, y - 1)) {
+					possibleMoves.add(new Move(x, y, x, y - 1));
+				}
 			}
-			if(checkTeam(x + 1, y - 1) != checkTeam(x, y)) {
-				possibleMoves.add(new Move(x, y, x + 1, y - 1));
+			if(getTeam(x + 1, y - 1) != getTeam(x, y)) {
+				if(isTileSafe(getTeam(x, y), x + 1, y - 1)) {
+					possibleMoves.add(new Move(x, y, x + 1, y - 1));
+				}
 			}
-			if(checkTeam(x - 1, y - 1) != checkTeam(x, y)) {
-				possibleMoves.add(new Move(x, y, x - 1, y - 1));
+			if(getTeam(x - 1, y - 1) != getTeam(x, y)) {
+				if(isTileSafe(getTeam(x, y), x - 1, y - 1)) {
+					possibleMoves.add(new Move(x, y, x - 1, y - 1));
+				}
 			}
 			break;
 		}
@@ -427,8 +471,8 @@ public class GameState {
 	}
 	
 	public boolean isPossibleMove(Move move) {
-		if(checkTeam(move.getSourceX(), move.getSourceY()) != 0) {
-			for(Move m : getPossibleMoves(checkTeam(move.getSourceX(), move.getSourceY()), move.getSourceX(), move.getSourceY())) {
+		if(getTeam(move.getSourceX(), move.getSourceY()) != 0) {
+			for(Move m : getPossibleMoves(getTeam(move.getSourceX(), move.getSourceY()), move.getSourceX(), move.getSourceY())) {
 				if(move.isSameMove(m)) {
 					return true;
 				}
@@ -437,7 +481,7 @@ public class GameState {
 		return false;
 	}
 	
-	public int checkTeam(int x, int y) {
+	public int getTeam(int x, int y) {
 		//0 = nothing
 		//1 = white
 		//2 = black

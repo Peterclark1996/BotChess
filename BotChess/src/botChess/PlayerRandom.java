@@ -7,7 +7,7 @@ public class PlayerRandom extends Player{
 	}
 
 	@Override
-	public Move takeTurn(GameState gs) {
+	public Move takeTurn(GameState gs, boolean inCheck) {
 		//Get all possible moves
 		Move[] moves = gs.getAllPossibleMoves(team);
 		

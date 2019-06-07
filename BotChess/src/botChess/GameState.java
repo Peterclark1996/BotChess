@@ -19,6 +19,11 @@ public class GameState {
 	//11 = black queen
 	//12 = black king
 	
+	private boolean whiteCheck = false;
+	private boolean blackCheck = false;
+	private int winner = 0; //0 = no winner, 1 = white, 2 = black, 3 = draw
+	private int turnsTaken = 0;
+	
 	public GameState() {
 		//Initialise the board
 		board = new int[8][8];
@@ -53,15 +58,53 @@ public class GameState {
 		board[7][7] = 8;
 	}
 	
-	public int getObjectAtTile(int x, int y) {
-		return board[x][y];
+	public GameState(GameState gs) {
+		for(int y = 0; y < 8; y++) {
+			for(int x = 0; x < 8; x++) {
+				board[x][y] = gs.getObjectAtTile(x, y);
+			}
+		}
+		
+		whiteCheck = gs.isWhiteInCheck();
+		blackCheck = gs.isBlackInCheck();
+		
+		winner = gs.getWinner();
+		
+		turnsTaken = gs.getTurnsTaken();
 	}
 	
 	public void makeMove(Move move) {
+		//Make the move
 		if(isPossibleMove(move)) {
 			board[move.getDestX()][move.getDestY()] = board[move.getSourceX()][move.getSourceY()];
 			board[move.getSourceX()][move.getSourceY()] = 0;
 		}
+		
+		//Check for check and check mate
+		whiteCheck = false;
+		blackCheck = false;
+		for(int y = 0; y < 8; y++) {
+			for(int x = 0; x < 8; x++) {
+				if((getObjectAtTile(x, y) == 6)) {
+					if(!isTileSafe(1, x, y)) {
+						whiteCheck = true;
+						if(getPossibleMoves(1, x, y).length == 0) {
+							winner = 2;
+						}
+					}
+				}
+				if((getObjectAtTile(x, y) == 12)){
+					if(!isTileSafe(2, x, y)) {
+						blackCheck = true;
+						if(getPossibleMoves(2, x, y).length == 0) {
+							winner = 1;
+						}
+					}
+				}
+			}
+		}
+		
+		turnsTaken++;
 	}
 	
 	public boolean isTileSafe(int team, int x, int y) {
@@ -80,13 +123,49 @@ public class GameState {
 		//Get every enemy move and return false if an enemy can move onto that the tile
 		for(int y2 = 0; y2 < 8; y2++) {
 			for(int x2 = 0; x2 < 8; x2++) {
-				Move[] moves = getPossibleMoves(enemyTeam, x2, y2);
-				for(int i = 0; i < moves.length - 1; i++) {
-					if(moves[i].getDestX() == x && moves[i].getDestY() == y) {
-						return false;
+				//Only check for the moves of non-king units to avoid infinite loops
+				if(board[x2][y2] != 6 && board[x2][y2] != 12) {
+					//Get all posible enemy moves, return false if any of them can move onto this tile
+					Move[] moves = getPossibleMoves(enemyTeam, x2, y2);
+					for(int i = 0; i < moves.length - 1; i++) {
+						if(moves[i].getDestX() == x && moves[i].getDestY() == y) {
+							return false;
+						}
 					}
 				}
 			}
+		}
+		
+		//Because the king was skipped, check to make sure the enemy king isnt adjacent to this tile
+		int enemyKing = 0;
+		if(team == 1) {
+			enemyKing = 12;
+		}else {
+			enemyKing = 6;
+		}
+		if(getObjectAtTile(x + 1, y) == enemyKing) {
+			return false;
+		}
+		if(getObjectAtTile(x, y + 1) == enemyKing) {
+			return false;
+		}
+		if(getObjectAtTile(x - 1, y) == enemyKing) {
+			return false;
+		}
+		if(getObjectAtTile(x, y - 1) == enemyKing) {
+			return false;
+		}
+		if(getObjectAtTile(x+ 1, y + 1) == enemyKing) {
+			return false;
+		}
+		if(getObjectAtTile(x - 1, y + 1) == enemyKing) {
+			return false;
+		}
+		if(getObjectAtTile(x - 1, y - 1) == enemyKing) {
+			return false;
+		}
+		if(getObjectAtTile(x + 1, y - 1) == enemyKing) {
+			return false;
 		}
 		
 		return true;
@@ -112,11 +191,20 @@ public class GameState {
 		return moveArrayList.toArray(output);
 	}
 	
-	public Move[] getPossibleMoves(int team, int x, int y) {//TODO Disallow king moving to check (Check mate)
+	public Move[] getPossibleMoves(int team, int x, int y) {//TODO The king can sometimes move into check
 		//0 = either team
 		//1 = white
 		//2 = black
+		
+		//If the team of the piece on the tile isnt equal to the team given
+		//If the team isnt 1 or 2 return
+		//If there is no piece on the tile return
 		if((getTeam(x, y) != team && team != 0) || board[x][y] == 0) {
+			return new Move[0];
+		}
+		
+		//If in check and the tile dosent contain the king, return
+		if((whiteCheck &&  board[x][y] != 6) ||(blackCheck &&  board[x][y] != 12)) {
 			return new Move[0];
 		}
 
@@ -481,6 +569,13 @@ public class GameState {
 		return false;
 	}
 	
+	public int getObjectAtTile(int x, int y) {
+		if(x < 0 || x > 7 || y < 0 || y > 7) {
+			return 0;
+		}
+		return board[x][y];
+	}
+	
 	public int getTeam(int x, int y) {
 		//0 = nothing
 		//1 = white
@@ -509,4 +604,19 @@ public class GameState {
 		return 0;
 	}
 	
+	public boolean isWhiteInCheck() {
+		return whiteCheck;
+	}
+	
+	public boolean isBlackInCheck() {
+		return blackCheck;
+	}
+	
+	public int getWinner() {
+		return winner;
+	}
+	
+	public int getTurnsTaken() {
+		return turnsTaken;
+	}
 }

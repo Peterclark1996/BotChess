@@ -180,6 +180,10 @@ public class GameHandler {
         currentGameThread.start();
 	}
 	
+	public static void gameFinished(GameRunnable thread) {
+		System.out.println("Game Over");
+	}
+	
 	public static void tileClicked(int x, int y) {
 		if(selectedX >= 0 && selectedX <= 7 && selectedY >= 0 && selectedY <= 7) {
 			currentGameRunnable.getCurrentPlayers()[currentGameRunnable.getCurrentTurn()].tileClicked(x, y);

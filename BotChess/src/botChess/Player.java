@@ -12,7 +12,7 @@ public abstract class Player {
 		this.team = team;
 	}
 	
-	public Move takeTurn(GameState gs, boolean inCheck) {
+	public Move takeTurn(GameState gs) {
 		return null;
 	}
 	

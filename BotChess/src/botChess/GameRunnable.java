@@ -18,23 +18,9 @@ public class GameRunnable implements Runnable{
 	
 	@Override
 	public void run() {
-		while(true) {//TODO change "true" to a actual win/draw condition
-			//Check if the current player is in check
-			//TODO Check if the current play is actually in check mate
-			//TODO Force the player to move then king when in check
-			boolean inCheck = false;
-			for(int y = 0; y < 8; y++) {
-				for(int x = 0; x < 8; x++) {
-					if((currentGameState.getObjectAtTile(x, y) == 6 || currentGameState.getObjectAtTile(x, y) == 12) && currentGameState.getTeam(x, y) == getCurrentTeamTurn()) {
-						if(!currentGameState.isTileSafe(getCurrentTeamTurn(), x, y)) {
-							inCheck = true;
-						}
-					}
-				}
-			}
-			
+		while(true) {//TODO Check for stalemates
 			//Get the players move
-			Move nextMove = currentPlayers[currentTurn].takeTurn(currentGameState, inCheck);
+			Move nextMove = currentPlayers[currentTurn].takeTurn(currentGameState);
 
 			//Check for a given move
 			if(nextMove == null) {
@@ -63,6 +49,12 @@ public class GameRunnable implements Runnable{
 						currentTurn = 1;
 					}else {
 						currentTurn = 0;
+					}
+					
+					//Check if the game is over
+					//TODO The game isnt ending here for some reason (Maybe the gamestate isnt setting "winner")
+					if(currentGameState.getWinner() != 0) {
+						GameHandler.gameFinished(this);
 					}
 					
 					//Wait for the given "turnTime"

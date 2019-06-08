@@ -88,7 +88,9 @@ public class GameState {
 				if((getObjectAtTile(x, y) == 6)) {
 					if(!isTileSafe(1, x, y)) {
 						whiteCheck = true;
+						System.out.println("White check: " + getPossibleMoves(1, x, y).length);
 						if(getPossibleMoves(1, x, y).length == 0) {
+							System.out.println("Winner 2");
 							winner = 2;
 						}
 					}
@@ -96,7 +98,9 @@ public class GameState {
 				if((getObjectAtTile(x, y) == 12)){
 					if(!isTileSafe(2, x, y)) {
 						blackCheck = true;
+						System.out.println("Black check: " + getPossibleMoves(2, x, y).length);
 						if(getPossibleMoves(2, x, y).length == 0) {
+							System.out.println("Winner 1");
 							winner = 1;
 						}
 					}
@@ -107,7 +111,7 @@ public class GameState {
 		turnsTaken++;
 	}
 	
-	public boolean isTileSafe(int team, int x, int y) {
+	public boolean isTileSafe(int team, int x, int y) {//TODO take into account pawns, they can only move diagonally in the enemy is there, plus they cant take by moving forwards
 		if(team != 1 && team != 2) {
 			return false;
 		}
@@ -127,6 +131,7 @@ public class GameState {
 				if(board[x2][y2] != 6 && board[x2][y2] != 12) {
 					//Get all posible enemy moves, return false if any of them can move onto this tile
 					Move[] moves = getPossibleMoves(enemyTeam, x2, y2);
+					System.out.println(moves.length);
 					for(int i = 0; i < moves.length - 1; i++) {
 						if(moves[i].getDestX() == x && moves[i].getDestY() == y) {
 							return false;

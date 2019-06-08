@@ -39,12 +39,9 @@ public class GameRunnable implements Runnable{
 					}
 				}
 				
-				if(!foundMove) {
-					nextMove = null;
-				}else {
+				if(foundMove){
 					//Perform the move
 					currentGameState.makeMove(nextMove);
-					nextMove = null;
 					if(currentTurn == 0) {
 						currentTurn = 1;
 					}else {
@@ -65,6 +62,7 @@ public class GameRunnable implements Runnable{
 					}
 				}
 			}
+			nextMove = null;
 			GameHandler.paintBoard();
 		}
 	}

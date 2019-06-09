@@ -12,4 +12,16 @@ public class GameStateLeaf {
 		this.gameState = gs;
 	}
 	
+	public GameStateLeaf getUpperBranch() {
+		return upperBranch;
+	}
+	
+	public Move getMove() {
+		return move;
+	}
+	
+	public GameState getGameState() {
+		return gameState;
+	}
+	
 }

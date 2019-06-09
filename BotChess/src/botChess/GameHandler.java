@@ -99,7 +99,7 @@ public class GameHandler {
 		panelSetupMid = new JPanel();
 		panelSetupMid.setLayout(new BoxLayout(panelSetupMid, BoxLayout.PAGE_AXIS));
 		panelSetupMid.setLayout(new GridLayout(2, 1));
-		playerNames = new String[] {"No Player", "Human", "Random"};
+		playerNames = new String[] {"No Player", "Human", "Random", "MiniMax Recursive (Depth = 5)"};
 		JComboBox<String> temp = new JComboBox<String>(playerNames);
 		temp.addActionListener(playerChange);
 		panelSetupMid.add(temp);
@@ -165,6 +165,9 @@ public class GameHandler {
 				break;
 			case 2:
 				players[i] = new PlayerRandom(i + 1);
+				break;
+			case 3:
+				players[i] = new PlayerMiniMaxRecursive(i + 1, new EvaluationStrengthCount(), 5);
 				break;
 			}
 		}

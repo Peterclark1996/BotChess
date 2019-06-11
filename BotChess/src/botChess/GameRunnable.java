@@ -31,7 +31,7 @@ public class GameRunnable implements Runnable{
 				}
 			}else {
 				//Validate the move
-				Move[] possibleMoves = currentGameState.getPossibleMoves(getCurrentTeamTurn(), nextMove.getSourceX(), nextMove.getSourceY());
+				Move[] possibleMoves = currentGameState.getPossibleMoves(getCurrentTeamTurn(), nextMove.getSourceX(), nextMove.getSourceY(), false);
 				boolean foundMove = false;
 				for(int i = 0; i < possibleMoves.length; i++) {
 					if(nextMove.isSameMove(possibleMoves[i])) {

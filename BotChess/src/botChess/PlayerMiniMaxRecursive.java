@@ -16,7 +16,7 @@ public class PlayerMiniMaxRecursive extends Player{
 	public Move takeTurn(GameState gs) {
 		ArrayList<Move> bestMoves = new ArrayList<Move>();
 		int bestValue = Integer.MIN_VALUE;
-		for(Move m : gs.getAllPossibleMoves(team)) {
+		for(Move m : gs.getAllPossibleMoves(team, false)) {
 			GameState nextState = new GameState(gs);
 			nextState.makeMove(m);
 			int nextValue = minimax(nextState, maxDepth - 1, Integer.MIN_VALUE, Integer.MAX_VALUE, true);
@@ -43,7 +43,7 @@ public class PlayerMiniMaxRecursive extends Player{
 		
 		if(maximisingPlayer) {
 			int maxEval = Integer.MIN_VALUE;
-			for(Move m : currentState.getAllPossibleMoves(team)) {
+			for(Move m : currentState.getAllPossibleMoves(team, false)) {
 				GameState nextState = new GameState(currentState);
 				nextState.makeMove(m);
 				int eval = minimax(nextState, depth - 1, alpha, beta, false);
@@ -56,7 +56,7 @@ public class PlayerMiniMaxRecursive extends Player{
 			return maxEval;
 		}else {
 			int minEval = Integer.MAX_VALUE;
-			for(Move m : currentState.getAllPossibleMoves(team)) {
+			for(Move m : currentState.getAllPossibleMoves(team, false)) {
 				GameState nextState = new GameState(currentState);
 				nextState.makeMove(m);
 				int eval = minimax(nextState, depth - 1, alpha, beta, true);

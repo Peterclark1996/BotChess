@@ -14,7 +14,7 @@ public class Move {
 		this.dy = dy;
 	}
 	
-	public boolean isPossible() {
+	public boolean isInBounds() {
 		if(sx < 0 || sx > 7 || sy < 0 || sy > 7 || dx < 0 || dx > 7 || dy < 0 || dy > 7) {
 			return false;
 		}

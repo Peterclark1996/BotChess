@@ -1,8 +1,12 @@
 package botChess;
 
+import java.util.Calendar;
+
 public class GameRunnable implements Runnable{
 	
 	private static final int redoTurnCooldown = 100; //Time in ms, when an invalid turn is given, the turn will be requested again after this amount of time
+	
+	private String[] playerNames;
 	
 	private GameState currentGameState;
 	private Player[] currentPlayers;
@@ -10,10 +14,11 @@ public class GameRunnable implements Runnable{
 	
 	private int turnTime;
 	
-	public GameRunnable(GameState gs, Player[] players, int turnTime) {
+	public GameRunnable(GameState gs, Player[] players, int turnTime, String[] playerNames) {
 		currentGameState = gs;
 		currentPlayers = players;
 		this.turnTime = turnTime;
+		this.playerNames = playerNames;
 	}
 	
 	@Override
@@ -40,6 +45,8 @@ public class GameRunnable implements Runnable{
 				}
 				
 				if(foundMove){
+					long startTime = Calendar.getInstance().getTimeInMillis();
+					
 					//Perform the move
 					currentGameState.makeMove(nextMove);
 					if(currentTurn == 0) {
@@ -49,16 +56,18 @@ public class GameRunnable implements Runnable{
 					}
 					
 					//Check if the game is over
-					//TODO The game isnt ending here for some reason (Maybe the gamestate isnt setting "winner")
 					if(currentGameState.getWinner() != 0) {
 						GameHandler.gameFinished(this);
 					}
 					
-					//Wait for the given "turnTime"
-					try {
-						Thread.sleep(turnTime);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
+					//Wait for the given "turnTime" minus the time taken for the move
+					long timeTaken = Calendar.getInstance().getTimeInMillis() - startTime;
+					if(timeTaken < turnTime) {
+						try {
+							Thread.sleep(turnTime - timeTaken);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
@@ -82,5 +91,9 @@ public class GameRunnable implements Runnable{
 	
 	public GameState getCurrentGameState() {
 		return currentGameState;
+	}
+	
+	public String[] getPlayerNames() {
+		return playerNames;
 	}
 }

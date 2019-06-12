@@ -30,6 +30,7 @@ public class PlayerMiniMaxRecursive extends Player{
 		}
 		
 		if(bestMoves.size() == 0) {
+			System.out.println("MiniMax failed to find move");
 			return null;
 		}else {
 			return bestMoves.get((int) (Math.random() * (bestMoves.size() - 1)));

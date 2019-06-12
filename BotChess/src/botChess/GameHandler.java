@@ -88,7 +88,7 @@ public class GameHandler {
 		panelSetupTop.add(new JLabel("Show Games:"));
 		inputShowGames = new JCheckBox();
 		panelSetupTop.add(inputShowGames);
-		panelSetupTop.add(new JLabel("Turn Time (ms):"));
+		panelSetupTop.add(new JLabel("Minimum Turn Time (ms):"));
 		inputTurnTime = new JTextField("1000");
 		panelSetupTop.add(inputTurnTime);
 		panelSetupTop.add(new JLabel("Games Per Matchup:"));
@@ -178,13 +178,31 @@ public class GameHandler {
         frameGame.pack();
         
         //Setup the game thread
-        currentGameRunnable = new GameRunnable(new GameState(), players, Integer.valueOf(inputTurnTime.getText()));
+        String[] playerNames = new String[2];
+        for(int i = 0; i < panelSetupMid.getComponentCount() - 1; i++) {
+        	playerNames[i] = (String)((JComboBox<String>)panelSetupMid.getComponent(i)).getSelectedItem();
+        }
+        currentGameRunnable = new GameRunnable(new GameState(), players, Integer.valueOf(inputTurnTime.getText()), playerNames);
         currentGameThread = new Thread(currentGameRunnable);
+        
+        //Setup the info frames
+        panelLeftPlayer.add(new JLabel("White Player"));
+        panelLeftPlayer.add(new JLabel(currentGameRunnable.getPlayerNames()[0]));
+        panelRightPlayer.add(new JLabel("Black Player"));
+        panelRightPlayer.add(new JLabel(currentGameRunnable.getPlayerNames()[1]));
+        
+        //Start the thread
         currentGameThread.start();
 	}
 	
 	public static void gameFinished(GameRunnable thread) {
-		System.out.println("Game Over");
+		String winner = "";
+		if(thread.getCurrentGameState().getWinner() == 1) {
+			winner = "White";
+		}else {
+			winner = "Black";
+		}
+		System.out.println("Game Finished : Winner = " + winner + " : Turns Taken = " + thread.getCurrentGameState().getTurnsTaken());
 	}
 	
 	public static void tileClicked(int x, int y) {

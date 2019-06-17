@@ -123,9 +123,11 @@ public class GameHandler {
         
         //Build the game view panels
         panelLeftPlayer = new JPanel();
+        panelLeftPlayer.setLayout(new GridLayout(2, 1));
         panelBoard = new GameBoard();
         panelBoard.addMouseListener(new GameMouseListener());
         panelRightPlayer = new JPanel();
+        panelRightPlayer.setLayout(new GridLayout(2, 1));
         
         panelLeftPlayer.setPreferredSize(new Dimension(256, 512));
         panelBoard.setPreferredSize(new Dimension(512, 512));
@@ -202,7 +204,7 @@ public class GameHandler {
 		}else {
 			winner = "Black";
 		}
-		System.out.println("Game Finished : Winner = " + winner + " : Turns Taken = " + thread.getCurrentGameState().getTurnsTaken());
+		System.out.println("Game Finished : Winner = " + winner + " : Turns Taken = " + thread.getCurrentGameState().getTurnsTaken() + "(" + Math.ceil((thread.getCurrentGameState().getTurnsTaken()/2)) + ")");
 	}
 	
 	public static void tileClicked(int x, int y) {

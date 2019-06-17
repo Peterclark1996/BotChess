@@ -25,7 +25,11 @@ public class GameState {
 	private int winner = 0; //0 = no winner, 1 = white, 2 = black, 3 = draw
 	private int turnsTaken = 0;
 	
+	private boolean startState = false;
+	
 	public GameState() {//Default Constructor
+		startState = true;
+		
 		//Initialise the board
 		board = new int[8][8];
 		for(int y = 0; y < 8; y++) {
@@ -76,47 +80,6 @@ public class GameState {
 		turnsTaken = gs.getTurnsTaken();
 	}
 	
-	public GameState(GameState gs, Move m) {//Copy another GameState and force a semi unchecked move
-		board = new int[8][8];
-		
-		for(int y = 0; y < 8; y++) {
-			for(int x = 0; x < 8; x++) {
-				board[x][y] = gs.getObjectAtTile(x, y);
-			}
-		}
-		
-		whiteCheck = gs.isWhiteInCheck();
-		blackCheck = gs.isBlackInCheck();
-		
-		winner = gs.getWinner();
-		
-		turnsTaken = gs.getTurnsTaken();
-		
-		
-		//Make the move
-		board[m.getDestX()][m.getDestY()] = board[m.getSourceX()][m.getSourceY()];
-		board[m.getSourceX()][m.getSourceY()] = 0;
-		
-		//Check for check
-		if(getTeam(m.getDestX(), m.getDestY()) == 1) {
-			blackCheck = false;
-			for(Move m2 : getPossibleMoves(1, m.getDestX(), m.getDestY(), true)) {
-				if(getObjectAtTile(m2.getDestX(), m2.getDestY()) == 12) {
-					blackCheck = true;
-				}
-			}
-		}else {
-			whiteCheck = false;
-			for(Move m2 : getPossibleMoves(2, m.getDestX(), m.getDestY(), true)) {
-				if(getObjectAtTile(m2.getDestX(), m2.getDestY()) == 6) {
-					whiteCheck = true;
-				}
-			}
-		}
-				
-		turnsTaken++;
-	}
-	
 	public void makeMove(Move move) {
 		makeMove(move, false);
 	}
@@ -138,6 +101,10 @@ public class GameState {
 		board[move.getDestX()][move.getDestY()] = board[move.getSourceX()][move.getSourceY()];
 		board[move.getSourceX()][move.getSourceY()] = 0;
 		
+		if(skipValidation) {
+			return;
+		}
+		
 		//Check for check
 		if(getTeam(move.getDestX(), move.getDestY()) == 1) {
 			blackCheck = false;
@@ -157,22 +124,98 @@ public class GameState {
 		
 		
 		//Check for check mate
+		if(CheckCheckMate(1)) {
+			winner = 2;
+		}
+		if(CheckCheckMate(2)) {
+			winner = 1;
+		}
+		
+		turnsTaken++;
+	}
+	
+	public boolean CheckCheck(int team) {
+		//Check if this team is in check
 		for(int y = 0; y < 8; y++) {
 			for(int x = 0; x < 8; x++) {
-				if(getObjectAtTile(x, y) == 6 && whiteCheck) {
-					if(getPossibleMoves(1, x, y, false).length == 0) {
-						winner = 2;
-					}
-				}
-				if(getObjectAtTile(x, y) == 12 && blackCheck){
-					if(getPossibleMoves(2, x, y, false).length == 0) {
-						winner = 1;
+				if(board[x][y] == 6 || board[x][y] == 12) {
+					for(Move m : getAllPossibleMoves(getEnemyTeam(team), true)) {
+						if(m.getDestX() == x && m.getDestY() == y) {
+							return true;
+						}
 					}
 				}
 			}
 		}
+		return false;
+	}
+	
+	public boolean CheckCheckMate(int team) {
+		//Check if this team is in check mate
+		if(!CheckCheck(team)) {
+			return false;
+		}
 		
-		turnsTaken++;
+		boolean north = true;
+		boolean northEast = true;
+		boolean east = true;
+		boolean southEast = true;
+		boolean south = true;
+		boolean southWest = true;
+		boolean west = true;
+		boolean northWest = true;
+		for(int y = 0; y < 8; y++) {
+			for(int x = 0; x < 8; x++) {
+				if(board[x][y] == 6 || board[x][y] == 12) {
+					for(Move m : getAllPossibleMoves(getEnemyTeam(team), false)) {
+						if(north) {
+							if(m.getDestX() == x && m.getDestY() == y + 1 || getTeam(x, y + 1) != team) {
+								north = false;
+							}
+						}
+						if(northEast) {
+							if(m.getDestX() == x + 1 && m.getDestY() == y + 1 || getTeam(x + 1, y + 1) != team) {
+								northEast = false;
+							}
+						}
+						if(east) {
+							if(m.getDestX() == x + 1 && m.getDestY() == y || getTeam(x + 1, y) != team) {
+								east = false;
+							}
+						}
+						if(southEast) {
+							if(m.getDestX() == x + 1 && m.getDestY() == y - 1 || getTeam(x + 1, y - 1) != team) {
+								southEast = false;
+							}
+						}
+						if(south) {
+							if(m.getDestX() == x && m.getDestY() == y - 1 || getTeam(x, y - 1) != team) {
+								south = false;
+							}
+						}
+						if(southWest) {
+							if(m.getDestX() == x - 1 && m.getDestY() == y - 1 || getTeam(x - 1, y - 1) != team) {
+								southWest = false;
+							}
+						}
+						if(west) {
+							if(m.getDestX() == x - 1 && m.getDestY() == y || getTeam(x - 1, y) != team) {
+								west = false;
+							}
+						}
+						if(northWest) {
+							if(m.getDestX() == x - 1 && m.getDestY() == y + 1 || getTeam(x - 1, y + 1) != team) {
+								northWest = false;
+							}
+						}
+					}
+				}
+			}
+		}
+		if(north || northEast || east || southEast || south || southWest || west || northWest) {
+			return true;
+		}
+		return false;
 	}
 	
 	public boolean isMoveSafe(Move move) {
@@ -187,25 +230,11 @@ public class GameState {
 			return false;
 		}
 		
-		//Get the enemy team id
-		int enemyTeam = 0;
-		if(team == 1) {
-			enemyTeam = 2;
-		}else {
-			enemyTeam = 1;
-		}
-		
 		//Create a new GameState where this move would have been done
-		GameState newState = new GameState(this, move);
+		GameState newState = new GameState(this);
+		newState.makeMove(move, true);
 		
-		//Return false if any enemy can move to this new position
-		for(Move m : newState.getAllPossibleMoves(enemyTeam, true)) {
-			if(m.getDestX() == move.getDestX() && m.getDestY() == move.getDestY()) {
-				return false;
-			}
-		}
-		
-		return true;
+		return !newState.CheckCheck(team);
 	}
 	
 	public Move[] getAllPossibleMoves(int team, boolean isAttackingMove) {
@@ -241,6 +270,11 @@ public class GameState {
 		//If the team isnt 1 or 2 return
 		//If there is no piece on the tile return
 		if((getTeam(x, y) != team && team != 0) || board[x][y] == 0) {
+			return new Move[0];
+		}
+		
+		//If in check and the tile dosent contain the king, return
+		if((whiteCheck && board[x][y] != 6 && team == 1) ||(blackCheck && board[x][y] != 12 && team == 2)) {
 			return new Move[0];
 		}
 
@@ -591,30 +625,26 @@ public class GameState {
 					}
 				}
 			}
-			
 			break;
 		}
-
-		//If in check and the tile dosent contain the king, return
-		if((whiteCheck && board[x][y] != 6 && team == 1) ||(blackCheck && board[x][y] != 12 && team == 2)) {
-			return new Move[0];
-		}
 		
-		//Remove all "Out of bounds" moves
+		//Remove all "Out of bounds" moves and moves that dont get the king out of check
 		for(int i = possibleMoves.size() - 1; i >= 0; i--) {
 			if(!possibleMoves.get(i).isInBounds()) {
 				possibleMoves.remove(i);
 			}
 			if(team == 1 && whiteCheck) {
 				//If whites in check, does this get them out of check?
-				GameState newState = new GameState(this, possibleMoves.get(i));
-				if(newState.isWhiteInCheck()) {
+				GameState newState = new GameState(this);
+				newState.makeMove(possibleMoves.get(i), true);
+				if(newState.CheckCheck(1)) {
 					possibleMoves.remove(i);
 				}
 			}else if(team == 2 && blackCheck){
 				//If blacks in check, does this get them out of check?
-				GameState newState = new GameState(this, possibleMoves.get(i));
-				if(newState.isBlackInCheck()) {
+				GameState newState = new GameState(this);
+				newState.makeMove(possibleMoves.get(i), true);
+				if(newState.CheckCheck(2)) {
 					possibleMoves.remove(i);
 				}
 			}
@@ -669,6 +699,14 @@ public class GameState {
 			return 2;
 		}
 		return 0;
+	}
+	
+	public int getEnemyTeam(int team) {
+		if(team == 1) {
+			return 2;
+		}else {
+			return 1;
+		}
 	}
 	
 	public boolean isWhiteInCheck() {

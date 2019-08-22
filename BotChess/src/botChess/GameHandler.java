@@ -40,9 +40,14 @@ public class GameHandler {
 	private static int selectedX = -10;
 	private static int selectedY = -10;
 	
+	private static boolean forceTwoPlayers = true;
+	
 	static ActionListener playerChange = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
+			if(forceTwoPlayers) {
+				return;
+			}
 			//Add blank player at the end if the play player isnt "No player"
 			if(((JComboBox<String>) panelSetupMid.getComponent(panelSetupMid.getComponentCount() - 1)).getSelectedIndex() != 0) {
 				JComboBox<String> temp = new JComboBox<String>(playerNames);
@@ -103,6 +108,11 @@ public class GameHandler {
 		JComboBox<String> temp = new JComboBox<String>(playerNames);
 		temp.addActionListener(playerChange);
 		panelSetupMid.add(temp);
+		if(forceTwoPlayers) {
+			JComboBox<String> temp2 = new JComboBox<String>(playerNames);
+			temp2.addActionListener(playerChange);
+			panelSetupMid.add(temp2);
+		}
 		
 		//Build the start button
 		panelSetupBot = new JPanel();
@@ -152,13 +162,17 @@ public class GameHandler {
 		if(Integer.valueOf(inputGamesPerMatchup.getText()) == null) {//TODO Use this setting
 			return;
 		}
-		if(panelSetupMid.getComponentCount() != 3) {//TODO make this accept more that two players (Value is 3 because the last combo box will always be "No player")
+		if(panelSetupMid.getComponentCount() != 3 && !forceTwoPlayers) {//TODO make this accept more that two players (Value is 3 because the last combo box will always be "No player")
 			return;
 		}
 		
 		//Build the player list
+		int maxPlayerBoxes = panelSetupMid.getComponentCount();
+		if(!forceTwoPlayers) {
+			maxPlayerBoxes--;
+		}
 		Player[] players = new Player[panelSetupMid.getComponentCount()];
-		for(int i = 0; i < panelSetupMid.getComponentCount() - 1; i++) {
+		for(int i = 0; i < maxPlayerBoxes; i++) {
 			switch(((JComboBox<String>)panelSetupMid.getComponent(i)).getSelectedIndex()) {
 			case 0:
 				return;
